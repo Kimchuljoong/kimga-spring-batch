@@ -11,7 +11,7 @@ allprojects {
     apply(plugin = "java-library")
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
-	
+
     java {
         toolchain {
             languageVersion = JavaLanguageVersion.of(21)
@@ -27,14 +27,19 @@ allprojects {
         runtimeOnly("org.postgresql:postgresql")
         compileOnly("org.projectlombok:lombok")
         annotationProcessor("org.projectlombok:lombok")
-        runtimeOnly("com.h2database:h2")
         implementation("com.fasterxml.jackson.core:jackson-databind")
+        implementation("com.fasterxml.jackson.core:jackson-core")
 
+        runtimeOnly("com.h2database:h2")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
         testCompileOnly("org.projectlombok:lombok")
         testAnnotationProcessor("org.projectlombok:lombok")
         testImplementation("org.junit.jupiter:junit-jupiter-api")
         testImplementation("org.junit.jupiter:junit-jupiter-engine")
+    }
+
+    tasks.named<Test>("test") {
+        useJUnitPlatform()
     }
 }

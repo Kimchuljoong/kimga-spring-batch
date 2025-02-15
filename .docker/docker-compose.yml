@@ -6,6 +6,6 @@ services:
     volumes:
       - ./data/test-db:/var/lib/postgresql/data
     ports:
-      - "5433:5433"
+      - "5433:5432"
     environment:
       POSTGRES_PASSWORD: testpassword

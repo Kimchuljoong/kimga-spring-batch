@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: ecommerce-batch
+
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/postgres?profileSQL=true
+    username: postgres
+    password: testpassword
+    hikari:
+      maximum-pool-size: 200
+
+
+  batch:
+    jdbc:
+      initialize-schema: always
+
+
+logging:
+  level:
+    root: info
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+    org.springframework.jdbc.core.StatementCreatorUtils: DEBUG
