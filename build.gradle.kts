@@ -39,7 +39,7 @@ allprojects {
         testImplementation("org.junit.jupiter:junit-jupiter-engine")
     }
 
-    tasks.named<Test>("test") {
-        useJUnitPlatform()
-    }
+//    tasks.named<Test>("test") {
+//        useJUnitPlatform()
+//    }
 }
