@@ -2,14 +2,18 @@ package kr.co.kimga.batch.jobconfig.product.upload;
 
 import kr.co.kimga.batch.domain.product.Product;
 import kr.co.kimga.batch.dto.ProductUploadCsvRow;
+import kr.co.kimga.batch.service.file.SplitFilePartitioner;
+import kr.co.kimga.batch.util.FileUtils;
 import kr.co.kimga.batch.util.ReflectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
@@ -29,6 +33,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.io.File;
 
 @Slf4j
 @Configuration
@@ -42,6 +47,34 @@ public class ProductUploadJobConfiguration {
                 .listener(jobExecutionListener)
                 .start(productUploadStep)
                 .build();
+    }
+
+    @Bean
+    public Step productUploadPartitionStep(
+            JobRepository jobRepository,
+            Step productUploadStep,
+            SplitFilePartitioner splitFilePartitioner
+    ) {
+        return new StepBuilder("productUploadPartitionStep", jobRepository)
+                .partitioner(productUploadStep.getName(), splitFilePartitioner)
+                .partitionHandler(filePartitionHandler)
+                .allowStartIfComplete(true)
+                .build();
+    }
+
+    @Bean
+    @JobScope
+    public SplitFilePartitioner splitFilePartitioner(
+            @Value("#{jobParameters['inputFilePath']}") String path,
+            @Value("#{jobParameters['gridSize']}") int gridSize
+    ) {
+        return new SplitFilePartitioner(FileUtils.splitCsv(new File(path)), gridSize);
+    }
+
+    @Bean
+    public TaskExecutorPartitionHandler filePartitionHandler(TaskExecutor taskExecutor) {
+        
+
     }
 
     @Bean
