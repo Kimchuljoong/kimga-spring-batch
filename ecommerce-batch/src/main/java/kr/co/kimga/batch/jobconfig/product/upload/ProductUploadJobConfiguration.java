@@ -1,7 +1,7 @@
 package kr.co.kimga.batch.jobconfig.product.upload;
 
 import kr.co.kimga.batch.domain.product.Product;
-import kr.co.kimga.batch.dto.ProductUploadCsvRow;
+import kr.co.kimga.batch.dto.upload.ProductUploadCsvRow;
 import kr.co.kimga.batch.service.file.SplitFilePartitioner;
 import kr.co.kimga.batch.util.FileUtils;
 import kr.co.kimga.batch.util.ReflectionUtils;
@@ -133,9 +133,9 @@ public class ProductUploadJobConfiguration {
     public ItemWriter<Product> productWriter(DataSource dataSource) {
         String sql = "insert into products(product_id, seller_id, category, product_name," +
                 "sales_start_date, sales_end_date, product_status, brand, manufacturer, sales_price," +
-                "stock_quantity, created_at, updated_at) values(:productId, :sellerId, :category, :productName," +
+                "stock_quantity) values(:productId, :sellerId, :category, :productName," +
                 ":salesStartDate, :salesEndDate, :productStatus, :brand, :manufacturer, :salesPrice," +
-                ":stockQuantity, :createdAt, :updatedAt)";
+                ":stockQuantity)";
 
         return new JdbcBatchItemWriterBuilder<Product>()
                 .dataSource(dataSource)

@@ -1,4 +1,4 @@
-package kr.co.kimga.batch.dto;
+package kr.co.kimga.batch.dto.upload;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

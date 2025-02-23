@@ -1,6 +1,6 @@
 package kr.co.kimga.batch.domain.product;
 
-import kr.co.kimga.batch.dto.ProductUploadCsvRow;
+import kr.co.kimga.batch.dto.upload.ProductUploadCsvRow;
 import kr.co.kimga.batch.util.DateTimeUtils;
 import kr.co.kimga.batch.util.RandomUtils;
 import lombok.AccessLevel;
@@ -49,5 +49,17 @@ public class Product {
                 now,
                 now
         );
+    }
+
+    public static Product of(
+            String productId, Long sellerId, String category,
+            String productName, LocalDate salesStartDate, LocalDate salesEndDate,
+            String productStatus, String brand, String manufacturer,
+            int salesPrice, int stockQuantity, LocalDateTime createdAt,
+            LocalDateTime updatedAt) {
+        return new Product(productId, sellerId, category, productName
+                , salesStartDate, salesEndDate, productStatus, brand
+                , manufacturer, salesPrice, stockQuantity, createdAt
+                , updatedAt);
     }
 }

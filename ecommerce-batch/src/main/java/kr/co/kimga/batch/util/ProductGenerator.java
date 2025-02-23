@@ -1,7 +1,7 @@
 package kr.co.kimga.batch.util;
 
 import kr.co.kimga.batch.domain.product.ProductStatus;
-import kr.co.kimga.batch.dto.ProductUploadCsvRow;
+import kr.co.kimga.batch.dto.upload.ProductUploadCsvRow;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
