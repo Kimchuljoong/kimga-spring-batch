@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: ecommerce-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/postgres?profileSQL=true
+    username: postgres
+    password: testpassword
+    hikari:
+      maximum-pool-size: 100
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+  logging:
+    level:
+      root: info
