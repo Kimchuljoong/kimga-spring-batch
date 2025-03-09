@@ -24,4 +24,17 @@ public class OrderController {
             @RequestBody PaymentRequest paymentRequest) {
         return OrderResponse.from(orderService.completePayment(orderId, paymentRequest.isSuccess()));
     }
+
+    @PostMapping("/{orderId}/complete")
+    public OrderResponse completeOrder(
+            @PathVariable("orderId") Long orderId) {
+        return OrderResponse.from(orderService.completeOrder(orderId));
+    }
+
+    @PostMapping("/{orderId}/cancel")
+    public OrderResponse cancelOrder(
+            @PathVariable("orderId") Long orderId) {
+        return OrderResponse.from(orderService.cancelOrder(orderId));
+    }
+
 }

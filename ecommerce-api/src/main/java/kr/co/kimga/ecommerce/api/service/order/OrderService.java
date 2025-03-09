@@ -36,10 +36,14 @@ public class OrderService {
 
     @Transactional
     public OrderResult completePayment(Long orderId, boolean success) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException(orderId));
+        Order order = findOrderById(orderId);
         order.completePayment(success);
         decreaseStock(success, order);
         return save(order);
+    }
+
+    private Order findOrderById(Long orderId) {
+        return orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
     private void decreaseStock(boolean success, Order order) {
@@ -47,6 +51,27 @@ public class OrderService {
             for (OrderItem orderItem : order.getOrderItems()) {
                 productService.decreaseStock(orderItem.getProductId(), orderItem.getQuantity());
             }
+        }
+    }
+
+    @Transactional
+    public OrderResult completeOrder(Long orderId) {
+        Order order = findOrderById(orderId);
+        order.complete();
+        return save(order);
+    }
+
+    @Transactional
+    public OrderResult cancelOrder(Long orderId) {
+        Order order = findOrderById(orderId);
+        order.cancel();
+        increaseStock(order);
+        return save(order);
+    }
+
+    private void increaseStock(Order order) {
+        for (OrderItem orderItem : order.getOrderItems()) {
+            productService.increaseStock(orderItem.getProductId(), orderItem.getQuantity());
         }
     }
 }
