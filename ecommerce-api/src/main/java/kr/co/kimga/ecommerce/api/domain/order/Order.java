@@ -50,12 +50,11 @@ public class Order {
         payment = Payment.createPayment(paymentMethod, calculateTotalAmount(), this);
     }
 
-    private Integer calculateTotalAmount() {
+    public int calculateTotalAmount() {
         return orderItems.stream()
                 .mapToInt(item -> item.getUnitPrice() * item.getQuantity())
                 .sum();
     }
-
 
     public void completePayment(boolean success) {
         if (orderStatus != OrderStatus.PENDING_PAYMENT) {
@@ -75,6 +74,28 @@ public class Order {
 
     public boolean isPaymentSuccess() {
         return payment.isSuccess();
+    }
+
+    public Long countProducts() {
+        return (long) orderItems.size();
+    }
+
+    public Long calculateTotalItemQuantity() {
+        return orderItems.stream()
+                .mapToLong(OrderItem::getQuantity)
+                .sum();
+    }
+
+    public Long getPaymentId() {
+        return payment.getPaymentId();
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return payment.getPaymentMethod();
+    }
+
+    public Timestamp getPaymentDate() {
+        return payment.getPaymentDate();
     }
 
     public void complete() {

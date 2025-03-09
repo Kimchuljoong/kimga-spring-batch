@@ -1,7 +1,7 @@
 package kr.co.kimga.ecommerce.api.controller.product;
 
 import kr.co.kimga.ecommerce.api.domain.product.ProductStatus;
-import kr.co.kimga.ecommerce.api.service.ProductResult;
+import kr.co.kimga.ecommerce.api.service.product.ProductResult;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;

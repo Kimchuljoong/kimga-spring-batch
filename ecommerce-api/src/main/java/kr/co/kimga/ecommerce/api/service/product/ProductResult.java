@@ -1,4 +1,4 @@
-package kr.co.kimga.ecommerce.api.service;
+package kr.co.kimga.ecommerce.api.service.product;
 
 import kr.co.kimga.ecommerce.api.domain.product.Product;
 import kr.co.kimga.ecommerce.api.domain.product.ProductStatus;

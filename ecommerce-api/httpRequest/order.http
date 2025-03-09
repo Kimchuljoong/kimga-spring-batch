@@ -1,0 +1,14 @@
+### 주문 생성
+POST http://localhost:8080/v1/orders
+Content-Type: application/json
+
+{
+  "customerId": 1,
+  "orderItems": [
+    {
+      "productId": "12312415-te12123-123re23",
+      "quantity": 2
+    }
+  ],
+  "paymentMethod": "CREDIT_CARD"
+}

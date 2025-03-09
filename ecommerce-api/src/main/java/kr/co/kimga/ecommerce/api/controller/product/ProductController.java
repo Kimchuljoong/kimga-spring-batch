@@ -1,6 +1,6 @@
 package kr.co.kimga.ecommerce.api.controller.product;
 
-import kr.co.kimga.ecommerce.api.service.ProductService;
+import kr.co.kimga.ecommerce.api.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

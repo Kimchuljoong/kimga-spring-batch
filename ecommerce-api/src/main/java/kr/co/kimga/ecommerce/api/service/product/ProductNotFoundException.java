@@ -1,4 +1,4 @@
-package kr.co.kimga.ecommerce.api.service;
+package kr.co.kimga.ecommerce.api.service.product;
 
 public class ProductNotFoundException extends RuntimeException {
     public ProductNotFoundException(String productId) {

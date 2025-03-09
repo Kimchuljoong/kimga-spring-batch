@@ -1,4 +1,4 @@
-package kr.co.kimga.ecommerce.api.service;
+package kr.co.kimga.ecommerce.api.service.product;
 
 import kr.co.kimga.ecommerce.api.domain.product.Product;
 import kr.co.kimga.ecommerce.api.domain.product.ProductRepository;
@@ -33,7 +33,7 @@ public class ProductService {
         product.decreaseStock(stockQuantity);
         productRepository.save(product);
     }
-    
+
     @Transactional
     public void increaseStock(String productId, int stockQuantity) {
         Product product = findProductById(productId);
