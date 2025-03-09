@@ -1,6 +1,7 @@
 package kr.co.kimga.ecommerce.api.service.order;
 
 import kr.co.kimga.ecommerce.api.domain.order.Order;
+import kr.co.kimga.ecommerce.api.domain.order.OrderItem;
 import kr.co.kimga.ecommerce.api.domain.order.OrderRepository;
 import kr.co.kimga.ecommerce.api.domain.payment.PaymentMethod;
 import kr.co.kimga.ecommerce.api.service.product.ProductResult;
@@ -31,5 +32,21 @@ public class OrderService {
 
     private OrderResult save(Order order) {
         return OrderResult.from(orderRepository.save(order));
+    }
+
+    @Transactional
+    public OrderResult completePayment(Long orderId, boolean success) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderNotFoundException(orderId));
+        order.completePayment(success);
+        decreaseStock(success, order);
+        return save(order);
+    }
+
+    private void decreaseStock(boolean success, Order order) {
+        if (success) {
+            for (OrderItem orderItem : order.getOrderItems()) {
+                productService.decreaseStock(orderItem.getProductId(), orderItem.getQuantity());
+            }
+        }
     }
 }

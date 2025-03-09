@@ -12,3 +12,19 @@ Content-Type: application/json
   ],
   "paymentMethod": "CREDIT_CARD"
 }
+
+### 결제 처리 성공
+POST http://localhost:8080/v1/orders/1/payment
+Content-Type: application/json
+
+{
+  "success": true
+}
+
+### 결제 처리 실패
+POST http://localhost:8080/v1/orders/2/payment
+Content-Type: application/json
+
+{
+  "success": false
+}

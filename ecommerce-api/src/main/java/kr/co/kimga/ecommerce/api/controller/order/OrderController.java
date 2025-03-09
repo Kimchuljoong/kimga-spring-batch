@@ -2,10 +2,7 @@ package kr.co.kimga.ecommerce.api.controller.order;
 
 import kr.co.kimga.ecommerce.api.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/orders")
@@ -19,5 +16,12 @@ public class OrderController {
         return OrderResponse.from(orderService.order(orderRequest.getCustomerId(),
                 orderRequest.getOrderItemCommands(), orderRequest.getPaymentMethod())
         );
+    }
+
+    @PostMapping("/{orderId}/payment")
+    public OrderResponse completePayment(
+            @PathVariable("orderId") Long orderId,
+            @RequestBody PaymentRequest paymentRequest) {
+        return OrderResponse.from(orderService.completePayment(orderId, paymentRequest.isSuccess()));
     }
 }
