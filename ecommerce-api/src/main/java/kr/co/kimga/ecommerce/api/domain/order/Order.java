@@ -4,6 +4,7 @@ package kr.co.kimga.ecommerce.api.domain.order;
 import jakarta.persistence.*;
 import kr.co.kimga.ecommerce.api.domain.payment.Payment;
 import kr.co.kimga.ecommerce.api.domain.payment.PaymentMethod;
+import kr.co.kimga.ecommerce.api.domain.payment.PaymentStatus;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -54,6 +55,43 @@ public class Order {
                 .mapToInt(item -> item.getUnitPrice() * item.getQuantity())
                 .sum();
     }
-    
 
+
+    public void completePayment(boolean success) {
+        if (orderStatus != OrderStatus.PENDING_PAYMENT) {
+            throw new IllegalOrderStateException("결제를 처리할 수 없는 상태의 주문 입니다.");
+        }
+        if (success) {
+            payment.complete();
+        } else {
+            payment.fail();
+        }
+        orderStatus = OrderStatus.PROCESSING;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return payment.getPaymentStatus();
+    }
+
+    public boolean isPaymentSuccess() {
+        return payment.isSuccess();
+    }
+
+    public void complete() {
+        if (orderStatus != OrderStatus.PROCESSING) {
+            throw new IllegalOrderStateException("처리 중인 주문만 완료할 수 있습니다.");
+        }
+        if (!isPaymentSuccess()) {
+            throw new IllegalOrderStateException("결제가 완료되지 않은 주문은 완료할 수 없습니다.");
+        }
+        orderStatus = OrderStatus.COMPLETED;
+    }
+
+    public void cancel() {
+        if (orderStatus == OrderStatus.COMPLETED) {
+            throw new IllegalOrderStateException("완료된 주문은 취소할 수 없습니다.");
+        }
+        payment.cancel();
+        orderStatus = OrderStatus.CANCELED;
+    }
 }
