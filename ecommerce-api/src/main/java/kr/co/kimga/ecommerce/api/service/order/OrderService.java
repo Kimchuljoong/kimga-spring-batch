@@ -6,6 +6,7 @@ import kr.co.kimga.ecommerce.api.domain.order.OrderRepository;
 import kr.co.kimga.ecommerce.api.domain.payment.PaymentMethod;
 import kr.co.kimga.ecommerce.api.service.product.ProductResult;
 import kr.co.kimga.ecommerce.api.service.product.ProductService;
+import kr.co.kimga.ecommerce.api.service.transaction.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final ProductService productService;
+    private final TransactionService transactionService;
 
     @Transactional
     public OrderResult order(Long customerId, List<OrderItemCommand> orderItems, PaymentMethod paymentMethod) {
