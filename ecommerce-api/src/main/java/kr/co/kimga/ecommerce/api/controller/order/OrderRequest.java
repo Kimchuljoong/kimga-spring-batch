@@ -23,4 +23,8 @@ public class OrderRequest {
                 .map(OrderItemCommand::of)
                 .toList();
     }
+
+    public static OrderRequest of(Long customerId, List<OrderItemRequest> orderItems, PaymentMethod paymentMethod) {
+        return new OrderRequest(customerId, orderItems, paymentMethod);
+    }
 }

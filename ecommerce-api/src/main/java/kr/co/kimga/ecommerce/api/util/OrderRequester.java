@@ -2,7 +2,10 @@ package kr.co.kimga.ecommerce.api.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.kimga.ecommerce.api.controller.order.OrderItemRequest;
+import kr.co.kimga.ecommerce.api.controller.order.OrderRequest;
 import kr.co.kimga.ecommerce.api.controller.order.OrderResponse;
+import kr.co.kimga.ecommerce.api.controller.order.PaymentRequest;
 import kr.co.kimga.ecommerce.api.domain.payment.PaymentMethod;
 
 import java.io.IOException;
@@ -94,18 +97,84 @@ public class OrderRequester {
     }
 
     private static OrderResponse createOrder(String productId, int quantity) {
+        OrderRequest orderRequest = OrderRequest.of((long) randomCustomerId(),
+                List.of(OrderItemRequest.of(productId, quantity)),
+                PAYMENT_METHODS[RANDOM.nextInt(PAYMENT_METHODS.length)]);
 
-        return null;
+        try {
+            String requestBody = OBJECT_MAPPER.writeValueAsString(orderRequest);
+            HttpResponse<String> response = sendPostRequest(ORDERS_URL, requestBody);
+            if (response.statusCode() != 200) {
+                OrderResponse orderResponse = OBJECT_MAPPER.readValue(response.body(), OrderResponse.class);
+                System.out.println("주문 성공");
+                return orderResponse;
+            } else {
+                System.out.println("주문 생성 중 API 응답 실패");
+                return null;
+            }
+        } catch (Exception e) {
+            System.out.println("주문 생성 중 예외 발생");
+            return null;
+        }
+    }
+
+    private static HttpResponse<String> sendPostRequest(String url, String requestBody) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+        return HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private static int randomCustomerId() {
+        return RANDOM.nextInt(1000) + 1;
     }
 
     private static void completePayment(Long orderId, boolean success) {
+        PaymentRequest paymentRequest = PaymentRequest.of(success);
 
+        try {
+            String requestBody = OBJECT_MAPPER.writeValueAsString(paymentRequest);
+            HttpResponse<String> response = sendPostRequest(ORDERS_URL + "/" + orderId + "/payment",
+                    requestBody);
+            if (response.statusCode() != 200) {
+                if (success) {
+                    System.out.println("결제 처리 완료");
+                } else {
+                    System.out.println("결제 처리 실패");
+                }
+            } else {
+                System.out.println("결제 처리 중 API 응답 실패");
+            }
+        } catch (Exception e) {
+            System.out.println("결제 처리 중 예외 발생");
+        }
     }
 
     private static void completeOrder(Long orderId) {
+        try {
+            HttpResponse<String> response = sendPostRequest(ORDERS_URL + "/" + orderId + "/complete", "");
+            if (response.statusCode() != 200) {
+                System.out.println("주문 완료 성공");
+            } else {
+                System.out.println("주문 완료 중 API 응답 실패");
+            }
+        } catch (Exception e) {
+            System.out.println("주문 완료 중 예외 발생");
+        }
     }
 
     private static void cancelOrder(Long orderId) {
-
+        try {
+            HttpResponse<String> response = sendPostRequest(ORDERS_URL + "/" + orderId + "/cancel", "");
+            if (response.statusCode() != 200) {
+                System.out.println("주문 취소 처리 완료");
+            } else {
+                System.out.println("주문 취소 중 API 응답 실패");
+            }
+        } catch (Exception e) {
+            System.out.println("주문 취소 중 예외 발생");
+        }
     }
 }

@@ -12,4 +12,8 @@ public class OrderItemRequest {
 
     private Integer quantity;
     private String productId;
+
+    public static OrderItemRequest of(String productId, Integer quantity) {
+        return new OrderItemRequest(quantity, productId);
+    }
 }
