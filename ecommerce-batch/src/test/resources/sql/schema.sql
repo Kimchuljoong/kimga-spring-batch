@@ -20,3 +20,18 @@ create index idx_products_category on products (category);
 create index idx_products_brand on products (brand);
 create index idx_products_manufacturer on products (manufacturer);
 create index idx_products_seller_id on products (seller_id);
+
+
+CREATE TABLE transaction_reports
+(
+    transaction_date     date,
+    transaction_type     varchar(5)     not null,
+    transaction_count    bigint         not null,
+    total_amount         bigint         not null,
+    customer_count       bigint         not null,
+    order_count          bigint         not null,
+    payment_method_count bigint         not null,
+    avg_product_count    decimal(15, 0) not null,
+    total_item_quantity  bigint         not null,
+    primary key (transaction_date, transaction_type)
+);
