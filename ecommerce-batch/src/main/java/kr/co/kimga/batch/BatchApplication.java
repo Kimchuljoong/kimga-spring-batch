@@ -1,5 +1,6 @@
 package kr.co.kimga.batch;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.prometheus.client.exporter.PushGateway;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -32,5 +33,10 @@ public class BatchApplication {
         threadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
         threadPoolTaskExecutor.setAwaitTerminationSeconds(30);
         return threadPoolTaskExecutor;
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 }

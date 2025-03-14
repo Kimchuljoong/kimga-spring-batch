@@ -2,6 +2,7 @@ package kr.co.kimga.batch.jobconfig.transaction.report;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.kimga.batch.domain.transaction.report.TransactionReport;
+import kr.co.kimga.batch.domain.transaction.report.TransactionReportMapRepository;
 import kr.co.kimga.batch.dto.transaction.TransactionLog;
 import kr.co.kimga.batch.service.transaction.TransactionReportAccumulator;
 import org.springframework.batch.core.Job;
@@ -14,13 +15,18 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
+import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.item.support.IteratorItemReader;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.sql.DataSource;
 
 @Configuration
 public class TransactionReportJobConfiguration {
@@ -48,7 +54,7 @@ public class TransactionReportJobConfiguration {
             ItemWriter<TransactionLog> logAccumulator
     ) {
         return new StepBuilder("transactionAccStep", jobRepository)
-                .<TransactionLog, TransactionLog>chunk(10, transactionManager)
+                .<TransactionLog, TransactionLog>chunk(1000, transactionManager)
                 .reader(logReader)
                 .writer(logAccumulator)
                 .allowStartIfComplete(true)
@@ -84,12 +90,36 @@ public class TransactionReportJobConfiguration {
     public Step transactionSaveStep(
             JobRepository jobRepository,
             PlatformTransactionManager transactionManager,
-            StepExecutionListener stepExecutionListener
+            StepExecutionListener stepExecutionListener,
+            ItemReader<TransactionReport> reportReader,
+            ItemWriter<TransactionReport> reportWriter
     ) {
         return new StepBuilder("transactionSaveStep", jobRepository)
                 .<TransactionReport, TransactionReport>chunk(10, transactionManager)
+                .reader(reportReader)
+                .writer(reportWriter)
                 .allowStartIfComplete(true)
                 .listener(stepExecutionListener)
+                .build();
+    }
+
+    @Bean
+    @StepScope
+    public ItemReader<TransactionReport> reportReader(TransactionReportMapRepository repository) {
+        return new IteratorItemReader<>(repository.getTransactionReports());
+    }
+
+    @Bean
+    @StepScope
+    public JdbcBatchItemWriter<TransactionReport> reportWriter(DataSource dataSource) {
+        String sql = "insert into transaction_reports(transaction_date, transaction_type, transaction_count, " +
+                "total_amount, customer_count, order_count, payment_method_count, avg_product_count, total_item_quantity) " +
+                "values(:transactionDate, :transactionType, :transactionCount, :totalAmount, :customerCount, " +
+                ":paymentMethodCount, :avgProductCount, :totalItemQuantity)";
+        return new JdbcBatchItemWriterBuilder<TransactionReport>()
+                .dataSource(dataSource)
+                .sql(sql)
+                .beanMapped()
                 .build();
     }
 }

@@ -2,11 +2,11 @@ package kr.co.kimga.batch.domain.transaction.report;
 
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 @Repository
-
 public class TransactionReportMapRepository {
 
     private final ConcurrentMap<String, TransactionReport> reportMap = new ConcurrentHashMap<>();
@@ -25,5 +25,11 @@ public class TransactionReportMapRepository {
 
     private static String getKey(TransactionReport transactionReport) {
         return transactionReport.getTransactionDate() + "|" + transactionReport.getTransactionType();
+    }
+
+    public List<TransactionReport> getTransactionReports() {
+        return reportMap.values().stream().toList();
+
+
     }
 }

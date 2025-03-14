@@ -43,7 +43,6 @@ public class TransactionReport {
     @Transient
     private Long sumProductCount;
 
-
     public static TransactionReport from(TransactionLog transactionLog) {
         return new TransactionReport(
                 DateTimeUtils.toLocalDateTime(transactionLog.getTimestamp()).toLocalDate(),
@@ -62,6 +61,21 @@ public class TransactionReport {
         );
     }
 
+    public static TransactionReport of(
+            LocalDate transactionDate, String transactionType, Long transactionCount,
+            Long totalAmount, Long customerCount, Long orderCount,
+            Long paymentMethodCount, BigDecimal avgProductCount,
+            Long totalItemQuantity, Set<String> customerSet, Set<String> orderSet,
+            Set<String> paymentMethodSet, Long sumProductCount
+    ) {
+        return new TransactionReport(
+                transactionDate, transactionType, transactionCount,
+                totalAmount, customerCount, orderCount,
+                paymentMethodCount, avgProductCount, totalItemQuantity,
+                customerSet, orderSet, paymentMethodSet, sumProductCount
+        );
+    }
+
     public void add(TransactionReport transactionReport) {
         transactionCount += transactionReport.getTransactionCount();
         totalAmount += transactionReport.getTotalAmount();
@@ -73,6 +87,6 @@ public class TransactionReport {
         paymentMethodCount = (long) paymentMethodSet.size();
         sumProductCount += transactionReport.getSumProductCount();
         avgProductCount = new BigDecimal((double) sumProductCount / transactionCount);
-        totalAmount += transactionReport.getTotalAmount();
+        totalItemQuantity += transactionReport.getTotalItemQuantity();
     }
 }
