@@ -4,13 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.kimga.batch.domain.transaction.report.TransactionReport;
 import kr.co.kimga.batch.domain.transaction.report.TransactionReportMapRepository;
 import kr.co.kimga.batch.dto.transaction.TransactionLog;
+import kr.co.kimga.batch.service.file.SplitFilePartitioner;
 import kr.co.kimga.batch.service.transaction.TransactionReportAccumulator;
+import kr.co.kimga.batch.util.FileUtils;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.partition.support.TaskExecutorPartitionHandler;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemReader;
@@ -30,6 +34,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
+import java.io.File;
 
 @Configuration
 public class TransactionReportJobConfiguration {
@@ -46,6 +51,29 @@ public class TransactionReportJobConfiguration {
                 .next(transactionSaveStep)
                 .listener(jobExecutionListener)
                 .build();
+    }
+
+    @Bean
+    @JobScope
+    public SplitFilePartitioner splitLogFilePartitioner(
+            @Value("#{stepExecutionContext['file']}") String path,
+            @Value("#{jobParameters['gridSize']}") int gridSize
+    ) {
+        return new SplitFilePartitioner(FileUtils.splitLog(new File(path), gridSize));
+    }
+
+    @Bean
+    @JobScope
+    public TaskExecutorPartitionHandler logFilePartitionHandler(
+            TaskExecutor taskExecutor,
+            Step transactionAccStep,
+            @Value("#{jobParameters['gridSize']}") int gridSize
+    ) {
+        TaskExecutorPartitionHandler handler = new TaskExecutorPartitionHandler();
+        handler.setTaskExecutor(taskExecutor);
+        handler.setStep(transactionAccStep);
+        handler.setGridSize(gridSize);
+        return handler;
     }
 
     @Bean

@@ -10,20 +10,24 @@ import java.util.stream.Stream;
 public class FileUtils {
 
     public static List<File> splitCsv(File csvFile, long fileCount) {
+        return splitFileAfterLineCount(csvFile, fileCount, true, ".csv");
+    }
+
+    private static List<File> splitFileAfterLineCount(File csvFile, long fileCount, boolean ignoreFirstLine, String suffix) {
         long lineCount;
 
         try (Stream<String> stream = Files.lines(csvFile.toPath(), StandardCharsets.UTF_8)) {
             lineCount = stream.count();
             long linesPerFile = (long) Math.ceil((double) lineCount / fileCount);
 
-            return splitFiles(csvFile, linesPerFile);
+            return splitFiles(csvFile, linesPerFile, ignoreFirstLine, suffix);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static List<File> splitFiles(File csvFile, long linePerFile) throws IOException {
+    private static List<File> splitFiles(File csvFile, long linePerFile, boolean ignoreFirstLine, String suffix) throws IOException {
         List<File> splitFiles = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFile))) {
             String line;
@@ -35,12 +39,12 @@ public class FileUtils {
             int fileIndex = 0;
 
             while ((line = reader.readLine()) != null) {
-                if (firstLine) {
+                if (ignoreFirstLine && firstLine) {
                     firstLine = false;
                     continue;
                 }
                 if (shouldCreateFile) {
-                    splitFile = createTempFile("split_" + (fileIndex++) + "_", ".csv");
+                    splitFile = createTempFile("split_" + (fileIndex++) + "_", suffix);
                     writer = new BufferedWriter(new FileWriter(splitFile));
                     splitFiles.add(splitFile);
                     lineCount = 0;
@@ -66,4 +70,9 @@ public class FileUtils {
         tempFile.deleteOnExit();
         return tempFile;
     }
+
+    public static List<File> splitLog(File logFile, long fileCount) {
+        return splitFileAfterLineCount(logFile, fileCount, true, ".csv");
+    }
+
 }
