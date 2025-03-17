@@ -13,7 +13,7 @@ public class CategoryReport {
     private LocalDate statDate = LocalDate.now();
 
     private String category;
-    private Integer productCount;
+    private Long productCount;
     private BigDecimal avgSalesPrice;
     private BigDecimal maxSalesPrice;
     private BigDecimal minSalesPrice;

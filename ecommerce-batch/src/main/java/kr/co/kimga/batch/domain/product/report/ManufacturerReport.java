@@ -13,7 +13,7 @@ public class ManufacturerReport {
     private LocalDate statDate = LocalDate.now();
 
     private String manufacturer;
-    private Integer productCount;
+    private Long productCount;
     private BigDecimal avgSalesPrice;
-    private Integer potentialSalesAmount;
+    private BigDecimal potentialSalesAmount;
 }

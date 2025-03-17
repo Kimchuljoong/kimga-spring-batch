@@ -13,7 +13,7 @@ public class BrandReport {
     private LocalDate statDate = LocalDate.now();
 
     private String brand;
-    private Integer productCount;
+    private Long productCount;
     private BigDecimal avgSalesPrice;
     private BigDecimal maxSalesPrice;
     private BigDecimal minSalesPrice;

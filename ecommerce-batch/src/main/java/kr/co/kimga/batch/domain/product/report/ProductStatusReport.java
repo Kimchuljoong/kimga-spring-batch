@@ -13,6 +13,6 @@ public class ProductStatusReport {
     private LocalDate statDate = LocalDate.now();
 
     private String productStatus;
-    private Integer productCount;
+    private Long productCount;
     private BigDecimal avgStockQuantity;
 }
