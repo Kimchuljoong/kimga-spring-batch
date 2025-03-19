@@ -1,5 +1,6 @@
 package kr.co.kimga.batch.jobconfig.product.upload;
 
+import jakarta.persistence.EntityManagerFactory;
 import kr.co.kimga.batch.domain.product.Product;
 import kr.co.kimga.batch.dto.upload.ProductUploadCsvRow;
 import kr.co.kimga.batch.service.file.SplitFilePartitioner;
@@ -20,7 +21,8 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
+import org.springframework.batch.item.database.JpaItemWriter;
+import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.item.support.SynchronizedItemReader;
@@ -33,7 +35,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.sql.DataSource;
 import java.io.File;
 
 @Slf4j
@@ -130,17 +131,10 @@ public class ProductUploadJobConfiguration {
     }
 
     @Bean
-    public ItemWriter<Product> productWriter(DataSource dataSource) {
-        String sql = "insert into products(product_id, seller_id, category, product_name," +
-                "sales_start_date, sales_end_date, product_status, brand, manufacturer, sales_price," +
-                "stock_quantity) values(:productId, :sellerId, :category, :productName," +
-                ":salesStartDate, :salesEndDate, :productStatus, :brand, :manufacturer, :salesPrice," +
-                ":stockQuantity)";
-
-        return new JdbcBatchItemWriterBuilder<Product>()
-                .dataSource(dataSource)
-                .sql(sql)
-                .beanMapped()
+    public JpaItemWriter<Product> productWriter(EntityManagerFactory entityManagerFactory) {
+        return new JpaItemWriterBuilder<Product>()
+                .entityManagerFactory(entityManagerFactory)
+                .usePersist(true)
                 .build();
     }
 }

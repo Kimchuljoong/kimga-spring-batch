@@ -1,5 +1,6 @@
 package kr.co.kimga.batch.domain.product;
 
+import jakarta.persistence.*;
 import kr.co.kimga.batch.dto.upload.ProductUploadCsvRow;
 import kr.co.kimga.batch.util.DateTimeUtils;
 import kr.co.kimga.batch.util.RandomUtils;
@@ -12,9 +13,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
+@Entity
+@Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Product {
+
+    @Id
     private String productId;
     private Long sellerId;
 
@@ -22,7 +27,9 @@ public class Product {
     private String productName;
     private LocalDate salesStartDate;
     private LocalDate salesEndDate;
-    private String productStatus;
+
+    @Enumerated(EnumType.STRING)
+    private ProductStatus productStatus;
     private String brand;
     private String manufacturer;
 
@@ -41,7 +48,7 @@ public class Product {
                 row.getProductName(),
                 DateTimeUtils.toLocalDate(row.getSalesStartDate()),
                 DateTimeUtils.toLocalDate(row.getSalesEndDate()),
-                row.getProductStatus(),
+                ProductStatus.valueOf(row.getProductStatus()),
                 row.getBrand(),
                 row.getManufacturer(),
                 row.getSalesPrice(),
@@ -54,7 +61,7 @@ public class Product {
     public static Product of(
             String productId, Long sellerId, String category,
             String productName, LocalDate salesStartDate, LocalDate salesEndDate,
-            String productStatus, String brand, String manufacturer,
+            ProductStatus productStatus, String brand, String manufacturer,
             int salesPrice, int stockQuantity, LocalDateTime createdAt,
             LocalDateTime updatedAt) {
         return new Product(productId, sellerId, category, productName

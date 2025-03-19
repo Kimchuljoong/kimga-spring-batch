@@ -1,5 +1,6 @@
 package kr.co.kimga.batch.jobconfig.product.download;
 
+import jakarta.persistence.EntityManagerFactory;
 import kr.co.kimga.batch.domain.product.Product;
 import kr.co.kimga.batch.dto.download.ProductDownloadCsvRow;
 import kr.co.kimga.batch.util.ReflectionUtils;
@@ -14,10 +15,8 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.JdbcPagingItemReader;
-import org.springframework.batch.item.database.PagingQueryProvider;
-import org.springframework.batch.item.database.builder.JdbcPagingItemReaderBuilder;
-import org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean;
+import org.springframework.batch.item.database.JpaPagingItemReader;
+import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.batch.item.support.SynchronizedItemWriter;
@@ -29,7 +28,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.sql.DataSource;
 import java.util.List;
 
 @Configuration
@@ -69,30 +67,16 @@ public class ProductDownloadJobConfiguration {
     }
 
     @Bean
-    public JdbcPagingItemReader<Product> productPagingReader(
-            DataSource dataSource,
-            PagingQueryProvider productPagingQueryProvider
+    @StepScope
+    public JpaPagingItemReader<Product> productPagingReader(
+            EntityManagerFactory entityManagerFactory
     ) {
-        return new JdbcPagingItemReaderBuilder<Product>()
-                .dataSource(dataSource)
+        return new JpaPagingItemReaderBuilder<Product>()
+                .entityManagerFactory(entityManagerFactory)
                 .name("productPagingReader")
-                .queryProvider(productPagingQueryProvider)
+                .queryString("select p from Product p")
                 .pageSize(1000)
-                .beanRowMapper(Product.class)
                 .build();
-    }
-
-    @Bean
-    public SqlPagingQueryProviderFactoryBean productPagingQueryProvider(DataSource dataSource) {
-        SqlPagingQueryProviderFactoryBean provider = new SqlPagingQueryProviderFactoryBean();
-        provider.setDataSource(dataSource);
-        provider.setSelectClause(
-                "select product_id, seller_id, category, product_name, " +
-                        "sales_start_date, sales_end_date, product_status, brand, manufacturer, " +
-                        "sales_price, stock_quantity, created_at, updated_at");
-        provider.setFromClause("from products");
-        provider.setSortKey("product_id");
-        return provider;
     }
 
     @Bean
